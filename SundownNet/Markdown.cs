@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Sundown
 {
@@ -19,10 +20,14 @@ namespace Sundown
 			}
 		}
 
-		Buffer buffer = Buffer.Create();
+		readonly Buffer buffer = Buffer.Create();
 
 		IntPtr ptr;
 		Renderer renderer;
+		readonly MarkdownExtensions extensions;
+
+		static readonly Regex relaxedLineEndingsMatcher = new Regex (@"^[\w\<][^\n]*\n+", RegexOptions.Compiled);
+		static readonly Regex twoNewlines = new Regex ("\n{2}", RegexOptions.Compiled);
 
 		[DllImport("sundown", CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr sd_markdown_new(uint extensions, IntPtr max_nesting, IntPtr callbacks, IntPtr opaque);
@@ -73,6 +78,7 @@ namespace Sundown
 		unsafe public Markdown(Renderer renderer, MarkdownExtensions extensions, int maxNesting)
 		{
 			this.renderer = renderer;
+			this.extensions = extensions;
 
 			ptr = sd_markdown_new((extensions == null ? 0 : extensions.ToUInt()), (IntPtr)maxNesting,
 				renderer.callbacksgchandle.AddrOfPinnedObject(), renderer.opaque);
@@ -158,6 +164,8 @@ namespace Sundown
 
 		public string Transform(string str)
 		{
+			if (extensions.RelaxLineEndings)
+				str = relaxedLineEndingsMatcher.Replace (str, match => twoNewlines.IsMatch(match.ToString()) ? match.ToString() : match + "  \n");
 			buffer.Size = IntPtr.Zero;
 			Render(buffer, str);
 			return buffer.ToString();

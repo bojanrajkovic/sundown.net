@@ -24,6 +24,7 @@ namespace Sundown
 		public bool SpaceHeaders    { get; set; }
 		public bool SuperScript     { get; set; }
 		public bool LaxSpacing      { get; set; }
+		public bool RelaxLineEndings { get; set; }
 
 		internal uint ToUInt()
 		{
