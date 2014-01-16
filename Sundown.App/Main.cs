@@ -167,6 +167,7 @@ namespace Sundown.App
 
 		static void Work(Options options, string inputfile)
 		{
+			Markdown.Init ();
 			Renderer renderer = null;
 			switch (options.Renderer) {
 			case RendererType.Html:

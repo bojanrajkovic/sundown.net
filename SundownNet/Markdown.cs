@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 
@@ -24,6 +26,34 @@ namespace Sundown
 
 		[DllImport("sundown", CallingConvention=CallingConvention.Cdecl)]
 		internal static extern IntPtr sd_markdown_new(uint extensions, IntPtr max_nesting, IntPtr callbacks, IntPtr opaque);
+
+		[DllImport ("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+		internal static extern IntPtr LoadLibrary (string lpFileName);
+
+		public static void Init ()
+		{
+			var tempDirectory = Path.GetTempFileName();
+			File.Delete(tempDirectory);
+			Directory.CreateDirectory(tempDirectory);
+			var dllPath = Path.Combine(tempDirectory, "sundown.dll");
+
+			if (IntPtr.Size == 8) {
+				using (var fos = File.Create(dllPath)) {
+					using (var ms = new MemoryStream(Properties.Resources.sundown64)) {
+						ms.CopyTo(fos);
+					}
+				}
+			} else {
+				using (var fos = File.Create(dllPath)) {
+					using (var ms = new MemoryStream(Properties.Resources.sundown)) {
+						ms.CopyTo(fos);
+					}
+				}
+			}
+
+			var h = LoadLibrary(dllPath);
+			Debug.Assert(h != IntPtr.Zero, "Unable to load library " + dllPath);
+		}
 
 		public Markdown(Renderer renderer)
 			: this(renderer, null)

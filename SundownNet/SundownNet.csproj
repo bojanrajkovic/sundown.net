@@ -40,12 +40,29 @@
     <Compile Include="HtmlRenderMode.cs" />
     <Compile Include="HtmlRenderer.cs" />
     <Compile Include="Markdown.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Renderer.cs" />
     <Compile Include="BufferStream.cs" />
     <Compile Include="BBCode.cs" />
     <Compile Include="TableOfContentRenderer.cs" />
     <Compile Include="NativeBuffer.cs" />
     <Compile Include="ClrBuffer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sundown.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sundown64.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
