@@ -59,6 +59,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\libsundown.dylib" />
     <None Include="Resources\sundown.dll" />
   </ItemGroup>
   <ItemGroup>

@@ -35,29 +35,47 @@ namespace Sundown
 		[DllImport ("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
 		internal static extern IntPtr LoadLibrary (string lpFileName);
 
+		[DllImport ("/usr/lib/libSystem.dylib")]
+		public static extern IntPtr dlopen (string file, int mode);
+
 		public static void Init ()
 		{
 			var tempDirectory = Path.GetTempFileName();
 			File.Delete(tempDirectory);
 			Directory.CreateDirectory(tempDirectory);
-			var dllPath = Path.Combine(tempDirectory, "sundown.dll");
 
-			if (IntPtr.Size == 8) {
-				using (var fos = File.Create(dllPath)) {
-					using (var ms = new MemoryStream(Properties.Resources.sundown64)) {
-						ms.CopyTo(fos);
+			IntPtr handle;
+			string dllPath;
+
+			if (Path.DirectorySeparatorChar == '\\') {
+				dllPath = Path.Combine(tempDirectory, "sundown.dll");
+				if (IntPtr.Size == 8) {
+					using (var fos = File.Create(dllPath)) {
+						using (var ms = new MemoryStream (Properties.Resources.sundown64)) {
+							ms.CopyTo(fos);
+						}
+					}
+				} else {
+					using (var fos = File.Create(dllPath)) {
+						using (var ms = new MemoryStream (Properties.Resources.sundown)) {
+							ms.CopyTo(fos);
+						}
 					}
 				}
+
+				handle = LoadLibrary(dllPath);
 			} else {
+				dllPath = Path.Combine(tempDirectory, "libsundown.dylib");
 				using (var fos = File.Create(dllPath)) {
-					using (var ms = new MemoryStream(Properties.Resources.sundown)) {
+					using (var ms = new MemoryStream (Properties.Resources.libsundown)) {
 						ms.CopyTo(fos);
 					}
 				}
+
+				handle = dlopen(dllPath, 0);
 			}
 
-			var h = LoadLibrary(dllPath);
-			Debug.Assert(h != IntPtr.Zero, "Unable to load library " + dllPath);
+			Debug.Assert(handle != IntPtr.Zero, "Unable to load library " + dllPath);
 		}
 
 		public Markdown(Renderer renderer)
