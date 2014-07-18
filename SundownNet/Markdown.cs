@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace Sundown
 {
@@ -40,9 +41,7 @@ namespace Sundown
 
 		public static void Init ()
 		{
-			var tempDirectory = Path.GetTempFileName();
-			File.Delete(tempDirectory);
-			Directory.CreateDirectory(tempDirectory);
+			var tempDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
 			IntPtr handle;
 			string dllPath;
